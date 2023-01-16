@@ -137,7 +137,7 @@ fn main() {
     // Assume the crawler returned the following results
     let crawler_results = &[
         DiscoveredItem {
-            blog_url: "https://blogs.com/".to_owned().to_owned(),
+            blog_url: "https://blogs.com/".to_owned(),
             post_url: "https://blogs.com/cooking/fried_eggs".to_owned(),
         },
         DiscoveredItem {

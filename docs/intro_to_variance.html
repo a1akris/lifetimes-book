@@ -8,7 +8,6 @@
 
         <!-- Custom HTML head -->
         
-        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
@@ -34,13 +33,13 @@
     </head>
     <body>
         <!-- Provide site root to javascript -->
-        <script type="text/javascript">
+        <script>
             var path_to_root = "";
             var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
-        <script type="text/javascript">
+        <script>
             try {
                 var theme = localStorage.getItem('mdbook-theme');
                 var sidebar = localStorage.getItem('mdbook-sidebar');
@@ -56,7 +55,7 @@
         </script>
 
         <!-- Set the theme before any content is loaded, prevents flash -->
-        <script type="text/javascript">
+        <script>
             var theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
@@ -68,7 +67,7 @@
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
-        <script type="text/javascript">
+        <script>
             var html = document.querySelector('html');
             var sidebar = 'hidden';
             if (document.body.clientWidth >= 1080) {
@@ -99,7 +98,7 @@
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
@@ -132,7 +131,7 @@
                 </div>
 
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
-                <script type="text/javascript">
+                <script>
                     document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
                     document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
                     Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
@@ -144,38 +143,31 @@
                     <main>
                         <h1 id="introduction-to-variance"><a class="header" href="#introduction-to-variance">Introduction to variance</a></h1>
 <p>Suppose we have the following generic structure:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>struct S&lt;T: ?Sized&gt;(T);
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Let's define a function with a lifetime cast:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct S&lt;T: ?Sized&gt;(T);
 </span>fn shortener&lt;'a: 'b, 'b&gt;(s: S&lt;&amp;'a str&gt;) -&gt; S&lt;&amp;'b str&gt; {
     s
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>As we have learnt from the previous chapter the function compiles because there is a <code>'a: 'b</code> bound, so <code>'a ~&gt; 'b</code> is allowed.
 We can simplify the example a bit. In Rust there is an implicit rule for the <code>'static</code> lifetime that <code>forall 'a | 'static: 'a</code>,
 so the following signature compiles too.</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct S&lt;T&gt;(T);
 </span>// implicit 'static: 'a
 fn shortener&lt;'a&gt;(s: S&lt;&amp;'static str&gt;) -&gt; S&lt;&amp;'a str&gt; {
     s
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Now let's replace our generic struct with a <code>Cell</code> struct from the core library which is defined approximately the same way:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>struct Cell&lt;T: ?Sized&gt; {
     value: UnsafeCell&lt;T&gt;
@@ -184,18 +176,15 @@ fn shortener&lt;'a&gt;(s: S&lt;&amp;'static str&gt;) -&gt; S&lt;&amp;'a str&gt; 
 struct UnsafeCell&lt;T: ?Sized&gt; {
     value: T
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>And we have a compilation error:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use std::cell::Cell;
 fn shortener&lt;'a&gt;(cell: Cell&lt;&amp;'static str&gt;) -&gt; Cell&lt;&amp;'a str&gt; {
     cell
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <pre><code class="language-Compiling playground v0.0.1 (/playground)">error[E0308]: mismatched types
  --&gt; src/main.rs:6:5
   |
@@ -215,31 +204,26 @@ For more information about this error, try `rustc --explain E0308`.
 error: could not compile `playground` due to previous error
 </code></pre>
 <p>We get the same compilation error if we omit specifying the <code>'a: 'b</code> relationship in our original example:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct S&lt;T: ?Sized&gt;(T);
 </span>fn shortener&lt;'a, 'b&gt;(s: S&lt;&amp;'a str&gt;) -&gt; S&lt;&amp;'b str&gt; {
     s
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>So it looks like <code>Cell</code> is somewhat exceptional and <code>'a: 'b</code> doesn't work for it for some reason. Let's
 figure out why we want to have exceptions from the rules we've learnt in the first place.</p>
 <p>Assume the following function compiles</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use std::cell::Cell;
 fn shortener&lt;'cell, 'a&gt;(cell: &amp;'cell Cell&lt;&amp;'static str&gt;, s: &amp;'a str) -&gt; &amp;'cell Cell&lt;&amp;'a str&gt; {
     cell.set(s);
     cell
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Let's infer the regions inside this <code>uaf</code> function:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn uaf() {
     let cell = Cell::new(&quot;Static str&quot;);
@@ -250,8 +234,7 @@ fn shortener&lt;'cell, 'a&gt;(cell: &amp;'cell Cell&lt;&amp;'static str&gt;, s: 
     println!(&quot;{}&quot;, cell2);
 
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>We need to infer 2 regions: <code>'cell</code> and <code>'a</code> following the last usage rule.</p>
 <pre><code>fn uaf() {
 /--- cell region
@@ -329,7 +312,7 @@ As a general rule:</p>
 <li>All mutable/interiory mutable contexts are invariant</li>
 <li>Function pointer arguments are contravariant</li>
 </ul>
-<table><thead><tr><th>Type</th><th>'a</th><th>T</th><th>U</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Type</th><th>'a</th><th>T</th><th>U</th></tr></thead><tbody>
 <tr><td><code>&amp;'a T</code></td><td>covariant</td><td>covariant</td><td></td></tr>
 <tr><td><code>&amp;'a mut T</code></td><td>covariant</td><td>invariant</td><td></td></tr>
 <tr><td><code>Box&lt;T&gt;</code></td><td></td><td>covariant</td><td></td></tr>
@@ -340,11 +323,11 @@ As a general rule:</p>
 <tr><td><code>*const T</code></td><td></td><td>covariant</td><td></td></tr>
 <tr><td><code>*mut T</code></td><td></td><td>invariant</td><td></td></tr>
 </tbody></table>
+</div>
 <p>It may be a bit confusing to see that variance is applied to a lifetime and some type T.
-That's because <code>T</code> may be a reference itself(like <code>&amp;'s str</code>). Let's understand how this rules
+That's because <code>T</code> may be a reference itself (like <code>&amp;'s str</code>). Let's understand how these rules
 work with one more example:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>struct S&lt;'a, T&gt; {
     val: &amp;'a T
@@ -357,19 +340,18 @@ where
 {
     s
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>We have a struct definiton corresponding to this row of the table</p>
-<table><thead><tr><th>Type</th><th>'a</th><th>T</th><th>U</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Type</th><th>'a</th><th>T</th><th>U</th></tr></thead><tbody>
 <tr><td><code>&amp;'a T</code></td><td>covariant</td><td>covariant</td><td></td></tr>
 </tbody></table>
+</div>
 <p>The table shows that <code>&amp;'a T</code> is covariant over <code>'a</code>. That means that <code>'a: 'b</code> implies <code>'a ~&gt; 'b</code>.
 We show it in our <code>shortener</code> funciton by shortening <code>'a</code> to <code>'c</code>. Also, <code>&amp;'a T</code> is covariant over <code>T</code>.
 That means if <code>T</code> is a reference the lifetime of the reference is covariant. We show that in <code>shortener</code>
 by shortening <code>&amp;'b str</code> to <code>&amp;'d str</code>.</p>
 <p>Let's modify our example a bit</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>struct S&lt;'a, T&gt; {
     val: &amp;'a mut T
@@ -382,16 +364,15 @@ where
 {
     s
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Not type <code>S</code> corresponds to this row of the table</p>
-<table><thead><tr><th>Type</th><th>'a</th><th>T</th><th>U</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Type</th><th>'a</th><th>T</th><th>U</th></tr></thead><tbody>
 <tr><td><code>&amp;'a mut T</code></td><td>covariant</td><td>invariant</td><td></td></tr>
 </tbody></table>
+</div>
 <p><code>shortener</code> no longer compiles. <code>T</code> is invrariant meaning <code>'b: 'd</code> doesn't allow <code>'b ~&gt; 'd</code>. However <code>S</code> is still
 covariant over <code>'a</code>, so <code>'a: 'c</code> should work. And indeed, if we remove <code>'b ~&gt; 'd</code> cast from the signature it compiles:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>struct S&lt;'a, T&gt; {
     val: &amp;'a mut T
@@ -403,8 +384,7 @@ where
 {
     s
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>This should be enough material to give you a basic undestanding of lifetime variance. In general, you want to prefer
 covariant contexts because they're the most flexible ones. Invariant contexts usually lead to some hard
 to grasp lifetime errors because references are tightly bounded to their regions and it can be tricky to move them into another regions.
@@ -446,18 +426,18 @@ on the Internet. Complete it to master the variance concept.</p>
 
 
 
-        <script type="text/javascript">
+        <script>
             window.playground_copyable = true;
         </script>
 
 
-        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
 
-        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
-        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
 
         <!-- Custom JS scripts -->
 

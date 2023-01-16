@@ -32,7 +32,7 @@ We need to come up with a concrete value for it at every place we call the funct
 To calculate it we need to adhere the following conditions:
 
 1. The lifetime value must be minimal.
-1. References with this resulting lifetime value must stay valid for the whole lifetime value(no dangling pointers!)
+1. References with this resulting lifetime value must stay valid for the whole lifetime value (no dangling pointers!)
 
 Ok, but that still sounds vague. What exactly is a lifetime value? Well, it's nothing more than a continuous[^continuous] region of code. 
 Like from line X to line Y. The single line with the function invocation above is a perfect region of code. That's some another perfect region of code:
@@ -74,10 +74,10 @@ fn post_urls_from_blog<'a>(
 }
 ```
 
-We see only one lifetime paramater which means we need to infer only one region for this function(Yes, we're inferring
+We see only one lifetime parameter which means we need to infer only one region for this function (yes, we're inferring
 regions for the whole function, not for each of its arguments).
 This region must hold `items`, `blog_url`, `Item` references and... an iterator. The complete function
-signature actually looks like that:
+signature actually looks like this:
 
 ```rust,noplayground
 fn post_urls_from_blog<'a>(
@@ -300,7 +300,7 @@ Try to infer regions for the remaining variables yourself.
 
 ## Validating regions
 It's time to ensure the safety. After we inferred all regions in the
-analyzed function we need to explore relationships between __the regions__(not variables) looking
+analyzed function we need to explore relationships between __the regions__ (not variables) looking
 for potential conflicts. Let's start at the point where the `crawler_results` reference is copied to be passed as an argument to the `post_urls_from_blog`
 function. Can we create this copy? 
 

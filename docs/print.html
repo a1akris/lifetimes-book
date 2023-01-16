@@ -9,7 +9,6 @@
 
         <!-- Custom HTML head -->
         
-        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
@@ -35,13 +34,13 @@
     </head>
     <body>
         <!-- Provide site root to javascript -->
-        <script type="text/javascript">
+        <script>
             var path_to_root = "";
             var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
-        <script type="text/javascript">
+        <script>
             try {
                 var theme = localStorage.getItem('mdbook-theme');
                 var sidebar = localStorage.getItem('mdbook-sidebar');
@@ -57,7 +56,7 @@
         </script>
 
         <!-- Set the theme before any content is loaded, prevents flash -->
-        <script type="text/javascript">
+        <script>
             var theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
@@ -69,7 +68,7 @@
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
-        <script type="text/javascript">
+        <script>
             var html = document.querySelector('html');
             var sidebar = 'hidden';
             if (document.body.clientWidth >= 1080) {
@@ -100,7 +99,7 @@
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
@@ -133,7 +132,7 @@
                 </div>
 
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
-                <script type="text/javascript">
+                <script>
                     document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
                     document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
                     Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
@@ -158,19 +157,16 @@ you can revisit them when you need to.</p>
 <p><em>It's recommended to follow the example by retyping it in your favorite editor</em></p>
 <p>Imagine we're writing a web crawler that collects posts from different blogs.
 The crawler's output looks like that:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>struct DiscoveredItem {
     blog_url: String,
     post_url: String,
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Now we want to write a function operating on the web crawler's results
 to iterate post URLs from a specific blog.</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>struct DiscoveredItem {
     blog_url: String,
@@ -192,8 +188,7 @@ fn post_urls_from_blog(
         }
     })
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Our function doesn't compile, the compiler complains it needs some lifetime annotations.</p>
 <pre><code>error[E0106]: missing lifetime specifier
   --&gt; src/main.rs:12:27
@@ -227,8 +222,7 @@ error: could not compile `playground` due to previous error
    |
 </code></pre>
 <p>Let's use it!</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>struct DiscoveredItem {
     blog_url: String,
@@ -250,8 +244,7 @@ fn post_urls_from_blog&lt;'a&gt;(
         }
     })
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Cool, now everything compiles. So that's it, we've won our fight with the borrow checker... right? Well, not quite.
 The compiler actually tricked us. It provided a suggestion which is semantically incorrect and which made
 our function over restrictive. That means the borrow checker will strike back soon and will make us scream out of pain.
@@ -282,7 +275,7 @@ Take a deep breath because in a moment...</p>
     // Assume the crawler returned the following results
     let crawler_results = &amp;[
         DiscoveredItem {
-            blog_url: &quot;https://blogs.com/&quot;.to_owned().to_owned(),
+            blog_url: &quot;https://blogs.com/&quot;.to_owned(),
             post_url: &quot;https://blogs.com/cooking/fried_eggs&quot;.to_owned(),
         },
         DiscoveredItem {
@@ -323,8 +316,7 @@ fn process_post(url: &amp;str) {
 }
 
 // Actually does nothing
-fn calculate_blog_stats(_blog_url: String) {}
-</code></pre></pre>
+fn calculate_blog_stats(_blog_url: String) {}</code></pre></pre>
 <p>This code doesn't compile. What's worse is that the compiler error is just absurd:</p>
 <pre><code>   Compiling playground v0.0.1 (/playground)
 error[E0505]: cannot move out of `blog_url` because it is borrowed
@@ -360,8 +352,7 @@ But what does it mean to evaluate a lifetime? Let's go back to our example
 and figure this out.</p>
 <p>As a borrow checker we're analyzing our <code>main</code> function and encountering a
 line of code with another function invocation.</p>
-<pre><code class="language-rust noplayground">let post_urls: Vec&lt;_&gt; = post_urls_from_blog(crawler_results, &amp;blog_url).collect();
-</code></pre>
+<pre><code class="language-rust noplayground">let post_urls: Vec&lt;_&gt; = post_urls_from_blog(crawler_results, &amp;blog_url).collect();</code></pre>
 <p>First of all, we need to read the function signature:</p>
 <pre><code class="language-rust noplayground">fn post_urls_from_blog&lt;'a&gt;(
     items: &amp;'a [DiscoveredItem], 
@@ -369,14 +360,13 @@ line of code with another function invocation.</p>
 ) -&gt; impl Iterator&lt;Item = &amp;'a str&gt; {
     // We're looking at the function from the borrow checker's perspective.
     // It doesn't see the impl :(
-}
-</code></pre>
+}</code></pre>
 <p>See this <code>'a</code> we defined here? This is a generic lifetime. Sort of a placeholder.
 We need to come up with a concrete value for it at every place we call the function.
 To calculate it we need to adhere the following conditions:</p>
 <ol>
 <li>The lifetime value must be minimal.</li>
-<li>References with this resulting lifetime value must stay valid for the whole lifetime value(no dangling pointers!)</li>
+<li>References with this resulting lifetime value must stay valid for the whole lifetime value (no dangling pointers!)</li>
 </ol>
 <p>Ok, but that still sounds vague. What exactly is a lifetime value? Well, it's nothing more than a continuous<sup class="footnote-reference"><a href="#continuous">1</a></sup> region of code. 
 Like from line X to line Y. The single line with the function invocation above is a perfect region of code. That's some another perfect region of code:</p>
@@ -389,8 +379,7 @@ Like from line X to line Y. The single line with the function invocation above i
 |
 |// Spawning a thread to do some further blog processing
 |let handle = std::thread::spawn(move || calculate_blog_stats(blog_url));
--
-</code></pre>
+-</code></pre>
 <p>Region boundaries basically define where the refences can be used and the duration of the borrow.
 <strong>All</strong> references belonging to the region must be safe to use at <strong>any</strong> line within the region.
 All regions are function scoped. There are no &quot;cross-function&quot; regions. When we encounter
@@ -407,20 +396,18 @@ with the guarantee that these references are safe to use at any line within the 
 ) -&gt; impl Iterator&lt;Item = &amp;'a str&gt; {
     // We're looking at the function from the borrow checker's perspective.
     // It doesn't see the impl :(
-}
-</code></pre>
-<p>We see only one lifetime paramater which means we need to infer only one region for this function(Yes, we're inferring
+}</code></pre>
+<p>We see only one lifetime parameter which means we need to infer only one region for this function (yes, we're inferring
 regions for the whole function, not for each of its arguments).
 This region must hold <code>items</code>, <code>blog_url</code>, <code>Item</code> references and... an iterator. The complete function
-signature actually looks like that:</p>
+signature actually looks like this:</p>
 <pre><code class="language-rust noplayground">fn post_urls_from_blog&lt;'a&gt;(
     items: &amp;'a [DiscoveredItem], 
     blog_url: &amp;'a str,
 ) -&gt; impl Iterator&lt;Item = &amp;'a str&gt; + 'a {
     // We're looking at the function from the borrow checker's perspective.
     // It doesn't see the impl :(
-}
-</code></pre>
+}</code></pre>
 <p>The compiler elided the last <code>'a</code> according to lifetime elision rules, so it was hidden from us. 
 Now we have all information to perform the evaluation. I will evaluate the signature in a backwards order to quickly show the region expansion, 
 but in general it's more natural to start from the input arguments.</p>
@@ -428,8 +415,7 @@ but in general it's more natural to start from the input arguments.</p>
 the references must stay valid? As long as they're used. So, basically, a size of a region is determined
 by the last reference usage this region holds. Let's apply this rule in practice. 
 Our function returns an iterator <code>impl Iterator&lt;Item = &amp;'a str&gt; + 'a</code>. How is it used?</p>
-<pre><code class="language-rust noplayground">let post_urls: Vec&lt;_&gt; = post_urls_from_blog(crawler_results, &amp;blog_url).collect();
-</code></pre>
+<pre><code class="language-rust noplayground">let post_urls: Vec&lt;_&gt; = post_urls_from_blog(crawler_results, &amp;blog_url).collect();</code></pre>
 <p>Well, we just collect it immediately into a vector therefore, our region with respect of iterator
 is a single line of code(the iterator is consumed and can't be used anywhere else):</p>
 <pre><code class="language-rust noplayground">fn main() {
@@ -460,15 +446,13 @@ is a single line of code(the iterator is consumed and can't be used anywhere els
     }
 
     handle.join().expect(&quot;Everything will be fine&quot;);
-}
-</code></pre>
+}</code></pre>
 <p>The consumed iterator yielded references <code>Item=&amp;'a str</code> that also belong to our region.
 We store them in the <code>post_urls</code> vector. Now we need to find the last usage of those references.
 It's here:</p>
 <pre><code class="language-rust noplayground">    for url in post_urls {
         process_post(url);
-    }
-</code></pre>
+    }</code></pre>
 <p>So <code>post_urls</code> references must be valid at least till the end of this loop. Expanding the region accordingly:</p>
 <pre><code class="language-rust noplayground">fn main() {
     let crawler_results = &amp;[
@@ -498,8 +482,7 @@ It's here:</p>
 |   }
 -
     handle.join().expect(&quot;Everything will be fine&quot;);
-}
-</code></pre>
+}</code></pre>
 <p>As for input arguments, usually they don't affect the region expansion because
 they must be valid only for the duration of a function call, but later we will study some cases when they do.
 Let's evaluate <code>items: &amp;'a [DiscoveredItem]</code> and <code>blog_url: &amp;'a str</code> together. They're just
@@ -533,8 +516,7 @@ If we had started our analysis from input arguments, our region would look like 
     }
 
     handle.join().expect(&quot;Everything will be fine&quot;);
-}
-</code></pre>
+}</code></pre>
 <p>But we've already analyzed the outputs and know that our region must be wider, hence the resulting
 <code>'a</code> region of the <code>post_urls_from_blog</code> function looks like that:</p>
 <pre><code class="language-rust noplayground">fn main() {
@@ -565,8 +547,7 @@ If we had started our analysis from input arguments, our region would look like 
 |   }
 -
     handle.join().expect(&quot;Everything will be fine&quot;);
-}
-</code></pre>
+}</code></pre>
 <p>The region holds: a copy of the <code>crawler_results</code> reference, a reference to <code>blog_url</code>, a vector of <code>post_urls</code> references,
 and the consumed iterator(yes, it's consumed at the first line of our region, but it still belongs to it).
 Note that we didn't analyze any relationships between references. We don't understand
@@ -603,12 +584,11 @@ rules. For example, this is the region for the <code>handle</code> variable:</p>
 |
 |   handle.join().expect(&quot;Everything will be fine&quot;);
 -
-}
-</code></pre>
+}</code></pre>
 <p>Try to infer regions for the remaining variables yourself.</p>
 <h2 id="validating-regions"><a class="header" href="#validating-regions">Validating regions</a></h2>
 <p>It's time to ensure the safety. After we inferred all regions in the
-analyzed function we need to explore relationships between <strong>the regions</strong>(not variables) looking
+analyzed function we need to explore relationships between <strong>the regions</strong> (not variables) looking
 for potential conflicts. Let's start at the point where the <code>crawler_results</code> reference is copied to be passed as an argument to the <code>post_urls_from_blog</code>
 function. Can we create this copy? </p>
 <pre><code class="language-rust noplayground">fn main() {
@@ -641,8 +621,7 @@ function. Can we create this copy? </p>
 |-
 |   handle.join().expect(&quot;Everything will be fine&quot;);
 -
-}
-</code></pre>
+}</code></pre>
 <p><code>crawler_resutls</code> region fills the whole <code>main</code> body clearly outliving our <code>post_urls_from_blog 'a</code> region meaning
 we can dereference the copy of <code>crawler_results</code> reference at any line within the <code>post_urls_from_blog 'a</code> region
 (note that we use <code>crawler_results</code> borrow only at the line with the function call, but it lasts till the end of the <code>post_urls_from_blog 'a</code> region anyway).</p>
@@ -676,8 +655,7 @@ we can dereference the copy of <code>crawler_results</code> reference at any lin
  -
     handle.join().expect(&quot;Everything will be fine&quot;);
  
-}
-</code></pre>
+}</code></pre>
 <p>No, we can't. We must be able to derefence this <code>blog_url</code> reference at any place within the <code>post_urls_from_blog 'a</code> region,
 but there is no way of doing that around the for loop because <code>blog_url</code> region ends(variable moves out of scope) right before the loop.</p>
 <p>Now we should be able to decipher the error message from the previous chapter:</p>
@@ -731,8 +709,7 @@ One way is to put the for loop before <code>std::thread::spawn</code>. This way 
 |   let handle = std::thread::spawn(move || calculate_blog_stats(blog_url));
 -
     handle.join().expect(&quot;Everything will be fine&quot;);
-}
-</code></pre>
+}</code></pre>
 <p>Another way is to get away with clones. But let's look at our region carefully:</p>
 <pre><code class="language-rust noplayground">/---blog_url region 
 |   let blog_url = get_blog_url(); 
@@ -745,8 +722,7 @@ One way is to put the for loop before <code>std::thread::spawn</code>. This way 
  |  for url in post_urls {
  |      process_post(url);
  |  }
- -
-</code></pre>
+ -</code></pre>
 <p>We don't really need the <code>blog_url</code> reference to be valid inside the for loop, we only care about <code>post_urls</code> there.
 This <code>post_urls_from_blog 'a</code> region is essentially a region for our <code>post_urls</code>, the <code>blog_url</code> region could be much
 smaller, but the function signature asks the compiler to infer only a single region, so the <code>blog_url</code> reference ends up coupled
@@ -764,8 +740,7 @@ and the one for <code>blog_url</code>, so regions in <code>main</code> would loo
  |  for url in post_urls {
  |      process_post(url);
  |  }
- -
-</code></pre>
+ -</code></pre>
 <p>This way <code>post_urls_from_blog 'blog_url</code> region is only 1-line long and borrowing <code>blog_url</code> for this line is fine, when <code>post_urls_from_blog 'post_urls</code> region
 holds only <code>post_urls</code> references and doesn't care about the <code>blog_url</code> region at all. Let's try to split this <code>'a</code> region!</p>
 <h2 id="splitting-post_urls_from_blog-a-region"><a class="header" href="#splitting-post_urls_from_blog-a-region">Splitting <code>post_urls_from_blog 'a</code> region</a></h2>
@@ -775,8 +750,7 @@ holds only <code>post_urls</code> references and doesn't care about the <code>bl
     blog_url: &amp;'blog_url str,
 ) -&gt; impl Iterator&lt;Item = &amp;'post_urls str&gt; {
     // ...
-}
-</code></pre>
+}</code></pre>
 <p>We're taking post urls from input items, so <code>items</code> clearly belong to <code>post_urls</code> region. We use <code>blog_url</code> only for filtering, so it belongs to its own 
 <code>blog_url</code> region. Iterator returns post urls from the input <code>items</code>, so <code>Item = &amp;str</code> must belong to <code>post_urls</code> region. But what about an <code>Iterator</code> itself?
 We're iterating <code>items</code>, so let's assign it to <code>post_urls</code> region.</p>
@@ -785,8 +759,7 @@ We're iterating <code>items</code>, so let's assign it to <code>post_urls</code>
     blog_url: &amp;'blog_url str,
 ) -&gt; impl Iterator&lt;Item = &amp;'post_urls str&gt; + 'post_urls {
     // ...
-}
-</code></pre>
+}</code></pre>
 <p>Now we will infer new regions for the updated signature, but in a bit different context to
 emphasize that borrow checker analyzes each function completely independetly:</p>
 <pre><code class="language-rust noplayground">fn uaf(options: &amp;CrawlerOptions) {
@@ -799,8 +772,7 @@ emphasize that borrow checker analyzes each function completely independetly:</p
     for url in iterator {
         do_stuff(url);
     }
-}
-</code></pre>
+}</code></pre>
 <p>Let's infer regions in the <code>uaf</code> function:</p>
 <pre><code class="language-rust noplayground">fn uaf(options: &amp;CrawlerOptions) {
 /---items region
@@ -815,8 +787,7 @@ emphasize that borrow checker analyzes each function completely independetly:</p
 ||      do_stuff(url);
 ||  }
 --
-}
-</code></pre>
+}</code></pre>
 <p><code>post_urls_from_blog 'post_urls</code> holds an iterator, and a reference to the <code>items</code> variable and it can dereference them at any line of this region
 because <code>items</code> region outlives the <code>'post_urls</code> region.</p>
 <pre><code class="language-rust noplayground">fn uaf(options: &amp;CrawlerOptions) {
@@ -831,16 +802,14 @@ because <code>items</code> region outlives the <code>'post_urls</code> region.</
         do_stuff(url);
     }
   
-}
-</code></pre>
+}</code></pre>
 <p><code>post_urls_from_blog 'blog_url</code> region holds just a reference to the <code>blog_url</code> variable. It's an input argument, therefore the reference should be valid
 only for the time of the function call, so the region is 1-line long. <code>blog_url</code> region clearly outlives this 1-line region, so it's safe to create a borrow
 there. As the result the <code>uaf</code> function passes the borrow checking just perfectly, but if we think about what's going on, we quickly realize that the iterator
 holds a reference to <code>blog_url</code> internally to do the comparisons, so in fact we have a use after free memory bug here. <code>post_urls_from_blog</code> function
 signature doesn't tell anything about this internal borrow, so borrow checker can't spot any issue while analyzing the <code>uaf</code> function. Luckily for us
 it can spot the issue during the analysis of the <code>post_urls_from_blog</code> function body which is done only once and independently from the <code>uaf</code> function.</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct DiscoveredItem {
 </span><span class="boring">   blog_url: String,
@@ -858,8 +827,7 @@ it can spot the issue during the analysis of the <code>post_urls_from_blog</code
         }
     })
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>The borrow checker emits the following error for this implementation:</p>
 <pre><code>error[E0623]: lifetime mismatch
   --&gt; src/main.rs:11:6
@@ -877,8 +845,7 @@ error: could not compile `playground` due to previous error
 <p>It was able to spot that the iterator borrows <code>blog_url</code> from the <code>'blog_url</code> region, but the signature
 suggests that the iterator borrows only from the <code>'post_urls</code> region, so the borrow checker threw a <code>lifetime mismatch</code> error.
 In order to fix it we must reflect this <code>blog_url</code> borrow in our signature by assigning the iterator to the <code>'blog_url</code> region.</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct DiscoveredItem {
 </span><span class="boring">   blog_url: String,
@@ -896,8 +863,7 @@ In order to fix it we must reflect this <code>blog_url</code> borrow in our sign
         }
     })
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <pre><code>   Compiling playground v0.0.1 (/playground)
 error[E0623]: lifetime mismatch
   --&gt; src/main.rs:11:6
@@ -913,8 +879,7 @@ For more information about this error, try `rustc --explain E0623`.
 error: could not compile `playground` due to previous error
 </code></pre>
 <p>But compilation fails with the same error. However, the signature is fine and communicates what we want now. Hmm... It's time to resort to magic!</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct DiscoveredItem {
 </span><span class="boring">   blog_url: String,
@@ -935,8 +900,7 @@ where
         }
     })
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>And now everything compiles, including the example from the previous chapter.
 Check it out:</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">struct DiscoveredItem {
@@ -1003,8 +967,7 @@ fn process_post(url: &amp;str) {
 }
 
 // Actually does nothing
-fn calculate_blog_stats(_blog_url: String) {}
-</code></pre></pre>
+fn calculate_blog_stats(_blog_url: String) {}</code></pre></pre>
 <p>We will demistify the added <code>where</code> clause and will understand the last compilation error in the next chapter,
 but before going further make sure you understood the material from this chapter.</p>
 <h2 id="chapter-exercises"><a class="header" href="#chapter-exercises">Chapter exercises</a></h2>
@@ -1018,8 +981,7 @@ Why do we want these regions to be minimal?</li>
     blog_url: &amp;'blog_url str,
 ) -&gt; impl Iterator&lt;Item = &amp;'post_urls str&gt; + 'blog_url {
     // ...
-}
-</code></pre>
+}</code></pre>
 <p>Go back to the <code>uaf</code> example. Infer and validate regions for the <code>uaf</code> using this <code>post_urls_from_blog</code> signature.
 Does <code>uaf</code> compile?</p>
 <div class="footnote-definition" id="continuous"><sup class="footnote-definition-label">1</sup>
@@ -1055,8 +1017,7 @@ and relationships between them directly from the function signature and assigns 
 It means when we're annotating our signatures with lifetimes we're doing the great part of the borrow checker's work ourselves. To get a brief
 feel of how the borrow checker actually operates we'll go through the next example written in real Rust. To make it readable I won't assume a new region
 for every line of code, but I'll assume it for every scope:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>{ // 'a
     let a = 42;
@@ -1070,8 +1031,7 @@ for every line of code, but I'll assume it for every scope:</p>
 
     println!(&quot;{}&quot;, ref_a); // prints 42
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>The example compiles just fine. It corresponds to the next lines of the pseudocode we met before and works for the same reasons.
 The only difference is <code>'a: 'b</code> relationship is not given, but inferred from the function scopes:</p>
 <pre><code>inferred 'a: 'b
@@ -1082,8 +1042,7 @@ ref_b: 'b
 ref_b = ref_a // fine, 'a ~&gt; 'b
 </code></pre>
 <p>Now let's try this variation.</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>{ // 'a
     let a = 42;
@@ -1097,8 +1056,7 @@ ref_b = ref_a // fine, 'a ~&gt; 'b
 
     println!(&quot;{}&quot;, ref_a); // doesn't compile
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>This code corresponds to these lines of the pseudocode above and doesn't compile:</p>
 <pre><code>inferred 'a: 'b
 
@@ -1107,7 +1065,7 @@ ref_b: 'b
 
 ref_a = ref_b // not fine, requires 'b: 'a
 </code></pre>
-<p>We can't assign <code>ref_a</code> to <code>ref_b</code> because we didn't infer <code>'b: 'a</code> relationship(inferring it would be wrong because <code>'b</code> region is
+<p>We can't assign <code>ref_a</code> to <code>ref_b</code> because we didn't infer <code>'b: 'a</code> relationship (inferring it would be wrong because <code>'b</code> region is
 shorter than <code>'a</code> region). We inferred only <code>'a: 'b</code>, so knowing that and by further inferring the region boundaries within
 the function scope compiler was able to produce a user friendly <code>b doesn't live long enough</code> error.</p>
 <p>At this point, it should be clear why <code>'a: 'b</code> relationship is required to be able to implicitly cast <code>'a</code> references into <code>'b</code> references.
@@ -1115,8 +1073,7 @@ In short, we just can't guarantee safety after the cast if <code>'a &gt;= 'b</co
 you want to study the last 2 examples carefully.</p>
 <h2 id="specifying-lifetime-relationships-in-signatures"><a class="header" href="#specifying-lifetime-relationships-in-signatures">Specifying lifetime relationships in signatures</a></h2>
 <p>Returning to our <code>post_urls_from_blog</code> example we had this error</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct DiscoveredItem {
 </span><span class="boring">   blog_url: String,
@@ -1134,8 +1091,7 @@ you want to study the last 2 examples carefully.</p>
         }
     })
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <pre><code>   Compiling playground v0.0.1 (/playground)
 error[E0623]: lifetime mismatch
   --&gt; src/main.rs:11:6
@@ -1151,8 +1107,7 @@ For more information about this error, try `rustc --explain E0623`.
 error: could not compile `playground` due to previous error
 </code></pre>
 <p>The error is a bit tricky because the root cause lies at this particular dot:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct DiscoveredItem {
 </span><span class="boring">   blog_url: String,
@@ -1171,14 +1126,12 @@ error: could not compile `playground` due to previous error
         }
     })
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Let's examine what happens in between of the <code>iter()</code> and <code>filter_map()</code> calls. <code>iter()</code> returns an
 <code>Iterator</code> from <code>items</code> and this iterator belongs to <code>'post_urls</code> region. <code>filter_map()</code> takes the <code>items</code>
 iterator, but also captures the <code>blog_url</code> from the <code>'blog_url</code> region in the closure, and we expect the resulting iterator to belong to the
 '<code>blog_url</code> region. We can represent what's happening with the following function:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn dot&lt;'post_urls, 'blog_url&gt;(
     input: impl Iterator&lt;Item = ()&gt; + 'post_urls,
@@ -1186,14 +1139,12 @@ iterator, but also captures the <code>blog_url</code> from the <code>'blog_url</
 {
     input
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>The function doesn't compile. The cast from <code>Iterator + 'post_urls</code> into <code>Iterator + 'blog_url</code> is prohibited because
 <code>'post_urls</code> and <code>'blog_url</code> lifetimes are unrelated. In order to make the cast possible we need to introduce a relationship
 between the regions. We want to be able to cast(shorten) <code>'post_urls</code> references into <code>'blog_url</code> references
 therefore we need a <code>'post_urls: 'blog_url</code> relationship. Let's type it out.</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn dot&lt;'post_urls, 'blog_url&gt;(
     iter: impl Iterator&lt;Item = ()&gt; + 'post_urls,
@@ -1203,15 +1154,13 @@ where
 {
     iter
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Now, with this additional bit of information the funciton does compile. The relationships between lifetimes
 aren't inferred between the function calls, we need to specify them manually in order to apply casts we want
 in the function body. Adding <code>where 'post_urls: 'blog_url</code> to <code>post_urls_from_blog</code> makes <code>items.iter()</code> cast
 into <code>Iterator + 'blog_url</code> valid. Adding this <code>where</code> clause to our <code>post_urls_from_blog</code> function
 makes it compile for the same reason.</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct DiscoveredItem {
 </span><span class="boring">   blog_url: String,
@@ -1233,11 +1182,9 @@ where
         }
     })
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>But what if we had used <code>'blog_url: 'post_urls</code> relationship instead?</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct DiscoveredItem {
 </span><span class="boring">   blog_url: String,
@@ -1259,8 +1206,7 @@ where
         }
     })
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Now instead of casting <code>items.iter()</code> which belongs to <code>'post_urls</code> we're casting the borrow of
 the <code>blog_url</code> in the <code>filter_map</code> closure <code>'blog_url ~&gt; 'post_urls</code>, so the resulting iterator appears
 to be <code>Iterator + 'post_urls</code> as shown in the updated function signature and this signature compiles too.
@@ -1283,8 +1229,7 @@ Ok, so we need to infer 2 regions by <em>the last usage</em> rule and we actuall
  |  for url in post_urls {
  |      process_post(url);
  |  }
- -
-</code></pre>
+ -</code></pre>
 <p>But now we have an extra precondition in our <code>post_urls_from_blog</code> function signature that <code>'blog_url</code> must be as wide as <code>'post_urls</code>
 region or wider, so we need to extend <code>post_urls_from_blog 'blog_url</code> region to meet this requirement.</p>
 <pre><code class="language-rust noplayground">/---blog_url region
@@ -1299,8 +1244,7 @@ region or wider, so we need to extend <code>post_urls_from_blog 'blog_url</code>
  || for url in post_urls {
  ||     process_post(url);
  || }
- --
-</code></pre>
+ --</code></pre>
 <p>As the result <code>post_urls_from_blog 'blog_url</code> and <code>blog_url</code> regions are not aligned and we have a conflict and the same compiler
 error we were struggling with from the beginning. We know that the region for the iterator must be shorter because, usually, iterators
 live less then the items they yield, but we failed to communicate this to the compiler and our signature requires the region for the <code>Iterator</code>
@@ -1318,8 +1262,7 @@ The regions for it will look as we want:</p>
  |  for url in post_urls {
  |      process_post(url);
  |  }
- -
-</code></pre>
+ -</code></pre>
 <p><code>post_urls_from_blog 'post_urls &gt; post_urls_from_blog 'blog_url</code>, so no extra region expansion is required and everything compiles just fine.</p>
 <p>Hope, this example was sufficient to show that lifetime subtyping is very straighforward to work with. The important
 thing to remember is when you define a signature you manually specify how many regions the compiler needs to infer and
@@ -1329,8 +1272,7 @@ can be shorter than others. If regions should be the same replace them with a si
 However, there is one more important thing to consider. To fully grasp lifetime mechanics we need to learn about lifetime variance.</p>
 <h2 id="chapter-exercises-1"><a class="header" href="#chapter-exercises-1">Chapter exercises</a></h2>
 <p>Analyze and write down the equivalent to the following signature:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct DiscoveredItem {
 </span><span class="boring">   blog_url: String,
@@ -1353,42 +1295,34 @@ where
         }
     })
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="introduction-to-variance"><a class="header" href="#introduction-to-variance">Introduction to variance</a></h1>
 <p>Suppose we have the following generic structure:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>struct S&lt;T: ?Sized&gt;(T);
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Let's define a function with a lifetime cast:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct S&lt;T: ?Sized&gt;(T);
 </span>fn shortener&lt;'a: 'b, 'b&gt;(s: S&lt;&amp;'a str&gt;) -&gt; S&lt;&amp;'b str&gt; {
     s
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>As we have learnt from the previous chapter the function compiles because there is a <code>'a: 'b</code> bound, so <code>'a ~&gt; 'b</code> is allowed.
 We can simplify the example a bit. In Rust there is an implicit rule for the <code>'static</code> lifetime that <code>forall 'a | 'static: 'a</code>,
 so the following signature compiles too.</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct S&lt;T&gt;(T);
 </span>// implicit 'static: 'a
 fn shortener&lt;'a&gt;(s: S&lt;&amp;'static str&gt;) -&gt; S&lt;&amp;'a str&gt; {
     s
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Now let's replace our generic struct with a <code>Cell</code> struct from the core library which is defined approximately the same way:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>struct Cell&lt;T: ?Sized&gt; {
     value: UnsafeCell&lt;T&gt;
@@ -1397,18 +1331,15 @@ fn shortener&lt;'a&gt;(s: S&lt;&amp;'static str&gt;) -&gt; S&lt;&amp;'a str&gt; 
 struct UnsafeCell&lt;T: ?Sized&gt; {
     value: T
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>And we have a compilation error:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use std::cell::Cell;
 fn shortener&lt;'a&gt;(cell: Cell&lt;&amp;'static str&gt;) -&gt; Cell&lt;&amp;'a str&gt; {
     cell
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <pre><code class="language-Compiling playground v0.0.1 (/playground)">error[E0308]: mismatched types
  --&gt; src/main.rs:6:5
   |
@@ -1428,31 +1359,26 @@ For more information about this error, try `rustc --explain E0308`.
 error: could not compile `playground` due to previous error
 </code></pre>
 <p>We get the same compilation error if we omit specifying the <code>'a: 'b</code> relationship in our original example:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct S&lt;T: ?Sized&gt;(T);
 </span>fn shortener&lt;'a, 'b&gt;(s: S&lt;&amp;'a str&gt;) -&gt; S&lt;&amp;'b str&gt; {
     s
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>So it looks like <code>Cell</code> is somewhat exceptional and <code>'a: 'b</code> doesn't work for it for some reason. Let's
 figure out why we want to have exceptions from the rules we've learnt in the first place.</p>
 <p>Assume the following function compiles</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use std::cell::Cell;
 fn shortener&lt;'cell, 'a&gt;(cell: &amp;'cell Cell&lt;&amp;'static str&gt;, s: &amp;'a str) -&gt; &amp;'cell Cell&lt;&amp;'a str&gt; {
     cell.set(s);
     cell
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Let's infer the regions inside this <code>uaf</code> function:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn uaf() {
     let cell = Cell::new(&quot;Static str&quot;);
@@ -1463,8 +1389,7 @@ fn shortener&lt;'cell, 'a&gt;(cell: &amp;'cell Cell&lt;&amp;'static str&gt;, s: 
     println!(&quot;{}&quot;, cell2);
 
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>We need to infer 2 regions: <code>'cell</code> and <code>'a</code> following the last usage rule.</p>
 <pre><code>fn uaf() {
 /--- cell region
@@ -1542,7 +1467,7 @@ As a general rule:</p>
 <li>All mutable/interiory mutable contexts are invariant</li>
 <li>Function pointer arguments are contravariant</li>
 </ul>
-<table><thead><tr><th>Type</th><th>'a</th><th>T</th><th>U</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Type</th><th>'a</th><th>T</th><th>U</th></tr></thead><tbody>
 <tr><td><code>&amp;'a T</code></td><td>covariant</td><td>covariant</td><td></td></tr>
 <tr><td><code>&amp;'a mut T</code></td><td>covariant</td><td>invariant</td><td></td></tr>
 <tr><td><code>Box&lt;T&gt;</code></td><td></td><td>covariant</td><td></td></tr>
@@ -1553,11 +1478,11 @@ As a general rule:</p>
 <tr><td><code>*const T</code></td><td></td><td>covariant</td><td></td></tr>
 <tr><td><code>*mut T</code></td><td></td><td>invariant</td><td></td></tr>
 </tbody></table>
+</div>
 <p>It may be a bit confusing to see that variance is applied to a lifetime and some type T.
-That's because <code>T</code> may be a reference itself(like <code>&amp;'s str</code>). Let's understand how this rules
+That's because <code>T</code> may be a reference itself (like <code>&amp;'s str</code>). Let's understand how these rules
 work with one more example:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>struct S&lt;'a, T&gt; {
     val: &amp;'a T
@@ -1570,19 +1495,18 @@ where
 {
     s
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>We have a struct definiton corresponding to this row of the table</p>
-<table><thead><tr><th>Type</th><th>'a</th><th>T</th><th>U</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Type</th><th>'a</th><th>T</th><th>U</th></tr></thead><tbody>
 <tr><td><code>&amp;'a T</code></td><td>covariant</td><td>covariant</td><td></td></tr>
 </tbody></table>
+</div>
 <p>The table shows that <code>&amp;'a T</code> is covariant over <code>'a</code>. That means that <code>'a: 'b</code> implies <code>'a ~&gt; 'b</code>.
 We show it in our <code>shortener</code> funciton by shortening <code>'a</code> to <code>'c</code>. Also, <code>&amp;'a T</code> is covariant over <code>T</code>.
 That means if <code>T</code> is a reference the lifetime of the reference is covariant. We show that in <code>shortener</code>
 by shortening <code>&amp;'b str</code> to <code>&amp;'d str</code>.</p>
 <p>Let's modify our example a bit</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>struct S&lt;'a, T&gt; {
     val: &amp;'a mut T
@@ -1595,16 +1519,15 @@ where
 {
     s
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Not type <code>S</code> corresponds to this row of the table</p>
-<table><thead><tr><th>Type</th><th>'a</th><th>T</th><th>U</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Type</th><th>'a</th><th>T</th><th>U</th></tr></thead><tbody>
 <tr><td><code>&amp;'a mut T</code></td><td>covariant</td><td>invariant</td><td></td></tr>
 </tbody></table>
+</div>
 <p><code>shortener</code> no longer compiles. <code>T</code> is invrariant meaning <code>'b: 'd</code> doesn't allow <code>'b ~&gt; 'd</code>. However <code>S</code> is still
 covariant over <code>'a</code>, so <code>'a: 'c</code> should work. And indeed, if we remove <code>'b ~&gt; 'd</code> cast from the signature it compiles:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>struct S&lt;'a, T&gt; {
     val: &amp;'a mut T
@@ -1616,8 +1539,7 @@ where
 {
     s
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>This should be enough material to give you a basic undestanding of lifetime variance. In general, you want to prefer
 covariant contexts because they're the most flexible ones. Invariant contexts usually lead to some hard
 to grasp lifetime errors because references are tightly bounded to their regions and it can be tricky to move them into another regions.
@@ -1648,22 +1570,22 @@ on the Internet. Complete it to master the variance concept.</p>
 
 
 
-        <script type="text/javascript">
+        <script>
             window.playground_copyable = true;
         </script>
 
 
-        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
 
-        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
-        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
 
         <!-- Custom JS scripts -->
 
-        <script type="text/javascript">
+        <script>
         window.addEventListener('load', function() {
             window.setTimeout(window.print, 100);
         });
