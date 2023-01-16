@@ -8,7 +8,6 @@
 
         <!-- Custom HTML head -->
         
-        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
@@ -34,13 +33,13 @@
     </head>
     <body>
         <!-- Provide site root to javascript -->
-        <script type="text/javascript">
+        <script>
             var path_to_root = "";
             var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
-        <script type="text/javascript">
+        <script>
             try {
                 var theme = localStorage.getItem('mdbook-theme');
                 var sidebar = localStorage.getItem('mdbook-sidebar');
@@ -56,7 +55,7 @@
         </script>
 
         <!-- Set the theme before any content is loaded, prevents flash -->
-        <script type="text/javascript">
+        <script>
             var theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
@@ -68,7 +67,7 @@
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
-        <script type="text/javascript">
+        <script>
             var html = document.querySelector('html');
             var sidebar = 'hidden';
             if (document.body.clientWidth >= 1080) {
@@ -99,7 +98,7 @@
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
@@ -132,7 +131,7 @@
                 </div>
 
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
-                <script type="text/javascript">
+                <script>
                     document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
                     document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
                     Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
@@ -172,8 +171,7 @@ and relationships between them directly from the function signature and assigns 
 It means when we're annotating our signatures with lifetimes we're doing the great part of the borrow checker's work ourselves. To get a brief
 feel of how the borrow checker actually operates we'll go through the next example written in real Rust. To make it readable I won't assume a new region
 for every line of code, but I'll assume it for every scope:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>{ // 'a
     let a = 42;
@@ -187,8 +185,7 @@ for every line of code, but I'll assume it for every scope:</p>
 
     println!(&quot;{}&quot;, ref_a); // prints 42
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>The example compiles just fine. It corresponds to the next lines of the pseudocode we met before and works for the same reasons.
 The only difference is <code>'a: 'b</code> relationship is not given, but inferred from the function scopes:</p>
 <pre><code>inferred 'a: 'b
@@ -199,8 +196,7 @@ ref_b: 'b
 ref_b = ref_a // fine, 'a ~&gt; 'b
 </code></pre>
 <p>Now let's try this variation.</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>{ // 'a
     let a = 42;
@@ -214,8 +210,7 @@ ref_b = ref_a // fine, 'a ~&gt; 'b
 
     println!(&quot;{}&quot;, ref_a); // doesn't compile
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>This code corresponds to these lines of the pseudocode above and doesn't compile:</p>
 <pre><code>inferred 'a: 'b
 
@@ -232,8 +227,7 @@ In short, we just can't guarantee safety after the cast if <code>'a &gt;= 'b</co
 you want to study the last 2 examples carefully.</p>
 <h2 id="specifying-lifetime-relationships-in-signatures"><a class="header" href="#specifying-lifetime-relationships-in-signatures">Specifying lifetime relationships in signatures</a></h2>
 <p>Returning to our <code>post_urls_from_blog</code> example we had this error</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct DiscoveredItem {
 </span><span class="boring">   blog_url: String,
@@ -251,8 +245,7 @@ you want to study the last 2 examples carefully.</p>
         }
     })
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <pre><code>   Compiling playground v0.0.1 (/playground)
 error[E0623]: lifetime mismatch
   --&gt; src/main.rs:11:6
@@ -268,8 +261,7 @@ For more information about this error, try `rustc --explain E0623`.
 error: could not compile `playground` due to previous error
 </code></pre>
 <p>The error is a bit tricky because the root cause lies at this particular dot:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct DiscoveredItem {
 </span><span class="boring">   blog_url: String,
@@ -288,14 +280,12 @@ error: could not compile `playground` due to previous error
         }
     })
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Let's examine what happens in between of the <code>iter()</code> and <code>filter_map()</code> calls. <code>iter()</code> returns an
 <code>Iterator</code> from <code>items</code> and this iterator belongs to <code>'post_urls</code> region. <code>filter_map()</code> takes the <code>items</code>
 iterator, but also captures the <code>blog_url</code> from the <code>'blog_url</code> region in the closure, and we expect the resulting iterator to belong to the
 '<code>blog_url</code> region. We can represent what's happening with the following function:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn dot&lt;'post_urls, 'blog_url&gt;(
     input: impl Iterator&lt;Item = ()&gt; + 'post_urls,
@@ -303,14 +293,12 @@ iterator, but also captures the <code>blog_url</code> from the <code>'blog_url</
 {
     input
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>The function doesn't compile. The cast from <code>Iterator + 'post_urls</code> into <code>Iterator + 'blog_url</code> is prohibited because
 <code>'post_urls</code> and <code>'blog_url</code> lifetimes are unrelated. In order to make the cast possible we need to introduce a relationship
 between the regions. We want to be able to cast(shorten) <code>'post_urls</code> references into <code>'blog_url</code> references
 therefore we need a <code>'post_urls: 'blog_url</code> relationship. Let's type it out.</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn dot&lt;'post_urls, 'blog_url&gt;(
     iter: impl Iterator&lt;Item = ()&gt; + 'post_urls,
@@ -320,15 +308,13 @@ where
 {
     iter
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Now, with this additional bit of information the funciton does compile. The relationships between lifetimes
 aren't inferred between the function calls, we need to specify them manually in order to apply casts we want
 in the function body. Adding <code>where 'post_urls: 'blog_url</code> to <code>post_urls_from_blog</code> makes <code>items.iter()</code> cast
 into <code>Iterator + 'blog_url</code> valid. Adding this <code>where</code> clause to our <code>post_urls_from_blog</code> function
 makes it compile for the same reason.</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct DiscoveredItem {
 </span><span class="boring">   blog_url: String,
@@ -350,11 +336,9 @@ where
         }
     })
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>But what if we had used <code>'blog_url: 'post_urls</code> relationship instead?</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct DiscoveredItem {
 </span><span class="boring">   blog_url: String,
@@ -376,8 +360,7 @@ where
         }
     })
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>Now instead of casting <code>items.iter()</code> which belongs to <code>'post_urls</code> we're casting the borrow of
 the <code>blog_url</code> in the <code>filter_map</code> closure <code>'blog_url ~&gt; 'post_urls</code>, so the resulting iterator appears
 to be <code>Iterator + 'post_urls</code> as shown in the updated function signature and this signature compiles too.
@@ -400,8 +383,7 @@ Ok, so we need to infer 2 regions by <em>the last usage</em> rule and we actuall
  |  for url in post_urls {
  |      process_post(url);
  |  }
- -
-</code></pre>
+ -</code></pre>
 <p>But now we have an extra precondition in our <code>post_urls_from_blog</code> function signature that <code>'blog_url</code> must be as wide as <code>'post_urls</code>
 region or wider, so we need to extend <code>post_urls_from_blog 'blog_url</code> region to meet this requirement.</p>
 <pre><code class="language-rust noplayground">/---blog_url region
@@ -416,8 +398,7 @@ region or wider, so we need to extend <code>post_urls_from_blog 'blog_url</code>
  || for url in post_urls {
  ||     process_post(url);
  || }
- --
-</code></pre>
+ --</code></pre>
 <p>As the result <code>post_urls_from_blog 'blog_url</code> and <code>blog_url</code> regions are not aligned and we have a conflict and the same compiler
 error we were struggling with from the beginning. We know that the region for the iterator must be shorter because, usually, iterators
 live less then the items they yield, but we failed to communicate this to the compiler and our signature requires the region for the <code>Iterator</code>
@@ -435,8 +416,7 @@ The regions for it will look as we want:</p>
  |  for url in post_urls {
  |      process_post(url);
  |  }
- -
-</code></pre>
+ -</code></pre>
 <p><code>post_urls_from_blog 'post_urls &gt; post_urls_from_blog 'blog_url</code>, so no extra region expansion is required and everything compiles just fine.</p>
 <p>Hope, this example was sufficient to show that lifetime subtyping is very straighforward to work with. The important
 thing to remember is when you define a signature you manually specify how many regions the compiler needs to infer and
@@ -446,8 +426,7 @@ can be shorter than others. If regions should be the same replace them with a si
 However, there is one more important thing to consider. To fully grasp lifetime mechanics we need to learn about lifetime variance.</p>
 <h2 id="chapter-exercises"><a class="header" href="#chapter-exercises">Chapter exercises</a></h2>
 <p>Analyze and write down the equivalent to the following signature:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">struct DiscoveredItem {
 </span><span class="boring">   blog_url: String,
@@ -470,8 +449,7 @@ where
         }
     })
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 
                     </main>
 
@@ -505,18 +483,18 @@ where
 
 
 
-        <script type="text/javascript">
+        <script>
             window.playground_copyable = true;
         </script>
 
 
-        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
 
-        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
-        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
 
         <!-- Custom JS scripts -->
 
