@@ -366,7 +366,7 @@ We need to come up with a concrete value for it at every place we call the funct
 To calculate it we need to adhere the following conditions:</p>
 <ol>
 <li>The lifetime value must be minimal.</li>
-<li>References with this resulting lifetime value must stay valid for the whole lifetime value(no dangling pointers!)</li>
+<li>References with this resulting lifetime value must stay valid for the whole lifetime value (no dangling pointers!)</li>
 </ol>
 <p>Ok, but that still sounds vague. What exactly is a lifetime value? Well, it's nothing more than a continuous<sup class="footnote-reference"><a href="#continuous">1</a></sup> region of code. 
 Like from line X to line Y. The single line with the function invocation above is a perfect region of code. That's some another perfect region of code:</p>
@@ -397,10 +397,10 @@ with the guarantee that these references are safe to use at any line within the 
     // We're looking at the function from the borrow checker's perspective.
     // It doesn't see the impl :(
 }</code></pre>
-<p>We see only one lifetime paramater which means we need to infer only one region for this function(Yes, we're inferring
+<p>We see only one lifetime parameter which means we need to infer only one region for this function (yes, we're inferring
 regions for the whole function, not for each of its arguments).
 This region must hold <code>items</code>, <code>blog_url</code>, <code>Item</code> references and... an iterator. The complete function
-signature actually looks like that:</p>
+signature actually looks like this:</p>
 <pre><code class="language-rust noplayground">fn post_urls_from_blog&lt;'a&gt;(
     items: &amp;'a [DiscoveredItem], 
     blog_url: &amp;'a str,
@@ -588,7 +588,7 @@ rules. For example, this is the region for the <code>handle</code> variable:</p>
 <p>Try to infer regions for the remaining variables yourself.</p>
 <h2 id="validating-regions"><a class="header" href="#validating-regions">Validating regions</a></h2>
 <p>It's time to ensure the safety. After we inferred all regions in the
-analyzed function we need to explore relationships between <strong>the regions</strong>(not variables) looking
+analyzed function we need to explore relationships between <strong>the regions</strong> (not variables) looking
 for potential conflicts. Let's start at the point where the <code>crawler_results</code> reference is copied to be passed as an argument to the <code>post_urls_from_blog</code>
 function. Can we create this copy? </p>
 <pre><code class="language-rust noplayground">fn main() {
@@ -1065,7 +1065,7 @@ ref_b: 'b
 
 ref_a = ref_b // not fine, requires 'b: 'a
 </code></pre>
-<p>We can't assign <code>ref_a</code> to <code>ref_b</code> because we didn't infer <code>'b: 'a</code> relationship(inferring it would be wrong because <code>'b</code> region is
+<p>We can't assign <code>ref_a</code> to <code>ref_b</code> because we didn't infer <code>'b: 'a</code> relationship (inferring it would be wrong because <code>'b</code> region is
 shorter than <code>'a</code> region). We inferred only <code>'a: 'b</code>, so knowing that and by further inferring the region boundaries within
 the function scope compiler was able to produce a user friendly <code>b doesn't live long enough</code> error.</p>
 <p>At this point, it should be clear why <code>'a: 'b</code> relationship is required to be able to implicitly cast <code>'a</code> references into <code>'b</code> references.
@@ -1480,7 +1480,7 @@ As a general rule:</p>
 </tbody></table>
 </div>
 <p>It may be a bit confusing to see that variance is applied to a lifetime and some type T.
-That's because <code>T</code> may be a reference itself(like <code>&amp;'s str</code>). Let's understand how this rules
+That's because <code>T</code> may be a reference itself (like <code>&amp;'s str</code>). Let's understand how these rules
 work with one more example:</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {

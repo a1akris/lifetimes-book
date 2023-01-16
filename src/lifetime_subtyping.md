@@ -87,7 +87,7 @@ ref_b: 'b
 ref_a = ref_b // not fine, requires 'b: 'a
 ```
 
-We can't assign `ref_a` to `ref_b` because we didn't infer `'b: 'a` relationship(inferring it would be wrong because `'b` region is
+We can't assign `ref_a` to `ref_b` because we didn't infer `'b: 'a` relationship (inferring it would be wrong because `'b` region is
 shorter than `'a` region). We inferred only `'a: 'b`, so knowing that and by further inferring the region boundaries within
 the function scope compiler was able to produce a user friendly `b doesn't live long enough` error.
 

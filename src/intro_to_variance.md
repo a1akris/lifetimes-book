@@ -206,7 +206,7 @@ Type            | 'a          | T               | U
 `*mut T`        |             | invariant       |
 
 It may be a bit confusing to see that variance is applied to a lifetime and some type T.
-That's because `T` may be a reference itself(like `&'s str`). Let's understand how this rules
+That's because `T` may be a reference itself (like `&'s str`). Let's understand how these rules
 work with one more example:
 
 ```rust
